@@ -1,5 +1,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -29,6 +30,8 @@ namespace ProseTutorial
             var spec = new ExampleSpec(examples);
 
             var learnedSet = prose.LearnGrammar(spec);
+
+            Console.WriteLine(learnedSet);
 
             var programs = learnedSet.RealizedPrograms;
             var output = programs.First().Invoke(input) as string;

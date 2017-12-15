@@ -1,3 +1,5 @@
+using System;
+
 using System.Collections.Generic;
 
 using Microsoft.ProgramSynthesis;
@@ -27,6 +29,7 @@ namespace ProseTutorial
                 var input = inputState[rule.Body[0]] as string;
                 var output = example.Value as string;
                 var refinedExample = input.IndexOf(output);
+
                 result[inputState] = refinedExample;
             }
 
@@ -43,6 +46,10 @@ namespace ProseTutorial
                 State inputState = example.Key;
                 var input = inputState[rule.Body[0]] as string;
                 var output = example.Value as string;
+
+                var refinedExample = input.IndexOf(output) + output.Length;
+
+                result[inputState] = refinedExample;
             }
 
             return new ExampleSpec(result);
@@ -58,6 +65,8 @@ namespace ProseTutorial
                 State inputState = example.Key;
                 var v = inputState[rule.Body[0]] as string;
                 var pos = (int) example.Value;
+
+                result[inputState] = pos + 1;
             }
 
             return new ExampleSpec(result);
