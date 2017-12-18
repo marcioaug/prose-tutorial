@@ -1,3 +1,5 @@
+using System;
+
 using Microsoft.ProgramSynthesis.Features;
 using Microsoft.ProgramSynthesis;
 using Microsoft.ProgramSynthesis.AST;
@@ -17,7 +19,7 @@ namespace ProseTutorial
         public static double AbsPos(double v, double k) => k;
 
         [FeatureCalculator("k", Method = CalculationMethod.FromLiteral)]
-        public static double K(int k) => 0;
+        public static double K(int k) => 1.0 / Math.Abs(k);
 
     }
 }

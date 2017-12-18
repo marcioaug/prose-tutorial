@@ -30,7 +30,7 @@ namespace ProseTutorial
                 {"19-Feb-1960", "Feb"} 
             };
 
-            var program = GetFirstProgram(examples).First();;
+            var program = GetFirstProgram(examples);
 
             Assert.AreEqual("Feb", program.Invoke(State.CreateForExecution(grammar.InputSymbol, "19-Feb-1960")) as string);
         }
@@ -45,7 +45,7 @@ namespace ProseTutorial
                 {"14-Jan-2012", "12"},
             };
 
-            var program = GetFirstProgram(examples).First();;
+            var program = GetFirstProgram(examples);
 
             Assert.AreEqual("16", program.Invoke(State.CreateForExecution(grammar.InputSymbol, "16-Feb-2016")) as string);
             Assert.AreEqual("12", program.Invoke(State.CreateForExecution(grammar.InputSymbol, "14-Jan-2012")) as string);
@@ -60,7 +60,7 @@ namespace ProseTutorial
                 {"16-Feb-2016", "16"}
             };
 
-            var programs = GetFirstProgram(examples);
+            var programs = GetPrograms(examples);
             var program = programs.First();
 
             Assert.AreEqual("16", program.Invoke(State.CreateForExecution(grammar.InputSymbol, "16-Feb-2016")) as string);
@@ -76,17 +76,52 @@ namespace ProseTutorial
                 {"(Titus Barik)", "Titus Barik"},
             };
 
-            var program = GetFirstProgram(examples).First();;
+            var program = GetFirstProgram(examples);
+
+            Assert.AreEqual("Gustavo Soares", program.Invoke(State.CreateForExecution(grammar.InputSymbol, "(Gustavo Soares)")) as string);
+            Assert.AreEqual("Titus Barik", program.Invoke(State.CreateForExecution(grammar.InputSymbol, "(Titus Barik)")) as string);
+        }
+
+        [TestMethod]
+        public void TestLearnSubstringNegativeAbsPosRanking()
+        {
+            var examples = new Dictionary<string, string> 
+            { 
+                {"(Gustavo Soares)", "Gustavo Soares"}
+            };
+
+            var program = GetTopKPrograms(examples, 1).First();
 
             Assert.AreEqual("Gustavo Soares", program.Invoke(State.CreateForExecution(grammar.InputSymbol, "(Gustavo Soares)")) as string);
             Assert.AreEqual("Titus Barik", program.Invoke(State.CreateForExecution(grammar.InputSymbol, "(Titus Barik)")) as string);
         }
 
 
-        public IEnumerable<ProgramNode> GetFirstProgram(Dictionary<string, string> examples) {
+        public ProgramNode GetFirstProgram(Dictionary<string, string> examples) {
+            return GetPrograms(examples).First();
+        }
+
+        public IEnumerable<ProgramNode> GetPrograms(Dictionary<string, string> examples) {
 
             var prose = ConfigureSynthesis(grammar);
+            var learnedSet = prose.LearnGrammar(GetSpecification(examples));
 
+            var programs = learnedSet.RealizedPrograms;
+
+            return programs;
+        }
+
+        public IEnumerable<ProgramNode> GetTopKPrograms(Dictionary<string, string> examples, int k) {
+
+            var prose = ConfigureSynthesis(grammar);
+            var scoreFeature = new RankingScore(grammar);
+            var programs = prose.LearnGrammarTopK(GetSpecification(examples), scoreFeature, k, null);
+
+            return programs;
+        }
+
+        public ExampleSpec GetSpecification(Dictionary<string, string> examples)
+        {
             var examplesState = new Dictionary<State, object>();
 
             foreach (KeyValuePair<string, string> example in examples) 
@@ -95,12 +130,7 @@ namespace ProseTutorial
                 examplesState[input] = example.Value;
             }
 
-            var spec = new ExampleSpec(examplesState);
-
-            var learnedSet = prose.LearnGrammar(spec);
-
-            var programs = learnedSet.RealizedPrograms;
-            return programs;
+            return new ExampleSpec(examplesState);
         }
 
 
