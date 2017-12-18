@@ -24,7 +24,6 @@ namespace ProseTutorial
         [TestMethod]
         public void TestLearnSubstringPositiveAbsPos()
         {
-
             var examples = new Dictionary<string, string> 
             { 
                 {"19-Feb-1960", "Feb"} 
@@ -38,7 +37,6 @@ namespace ProseTutorial
         [TestMethod]
         public void TestLearnSubstringPositiveAbsPosSecOcorrence()
         {
-
             var examples = new Dictionary<string, string> 
             { 
                 {"16-Feb-2016", "16"}, 
@@ -54,7 +52,6 @@ namespace ProseTutorial
         [TestMethod]
         public void TestLearnSubstringPositiveAbsPosSecOcorrenceOneExp() 
         {
-
             var examples = new Dictionary<string, string>
             {
                 {"16-Feb-2016", "16"}
@@ -64,7 +61,9 @@ namespace ProseTutorial
             var program = programs.First();
 
             Assert.AreEqual("16", program.Invoke(State.CreateForExecution(grammar.InputSymbol, "16-Feb-2016")) as string);
-            Assert.AreEqual(8, programs.Count()); //Adicionando o suporte a posições negativas aumenta o número de programas de 2 para 8.
+            //Adicionando o suporte a posições negativas aumenta o número de programas de 2 para 8.
+            //Adicionando o suporte a posuções relativas aumenta o número de programas de 8 para 14.
+            Assert.AreEqual(14, programs.Count()); 
         }
 
         [TestMethod]
@@ -96,6 +95,21 @@ namespace ProseTutorial
             Assert.AreEqual("Titus Barik", program.Invoke(State.CreateForExecution(grammar.InputSymbol, "(Titus Barik)")) as string);
         }
 
+        [TestMethod]
+        public void TestLearnSubstringTwoExamples() 
+        {
+            var examples = new Dictionary<string, string> 
+            { 
+                {"Gustavo Soares", "Soares"}, 
+                {"Sumit Gulwani", "Gulwani"},
+            };
+
+            var program = GetFirstProgram(examples);
+
+            Assert.AreEqual("Soares", program.Invoke(State.CreateForExecution(grammar.InputSymbol, "Gustavo Soares")) as string);
+            Assert.AreEqual("Gulwani", program.Invoke(State.CreateForExecution(grammar.InputSymbol, "Sumit Gulwani")) as string);
+        }
+
 
         public ProgramNode GetFirstProgram(Dictionary<string, string> examples) {
             return GetPrograms(examples).First();
@@ -115,6 +129,7 @@ namespace ProseTutorial
 
             var prose = ConfigureSynthesis(grammar);
             var scoreFeature = new RankingScore(grammar);
+
             var programs = prose.LearnGrammarTopK(GetSpecification(examples), scoreFeature, k, null);
 
             return programs;
