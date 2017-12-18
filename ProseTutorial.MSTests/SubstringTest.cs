@@ -110,6 +110,19 @@ namespace ProseTutorial
             Assert.AreEqual("Gulwani", program.Invoke(State.CreateForExecution(grammar.InputSymbol, "Sumit Gulwani")) as string);
         }
 
+        [TestMethod]
+        public void TestLearnSubstringOneExample() 
+        {
+            var examples = new Dictionary<string, string> 
+            { 
+                {"Gustavo Soares", "Soares"}
+            };
+
+            var program =  GetTopKPrograms(examples, 1).First();
+
+            Assert.AreEqual("Soares", program.Invoke(State.CreateForExecution(grammar.InputSymbol, "Gustavo Soares")) as string);
+            Assert.AreEqual("Gulwani", program.Invoke(State.CreateForExecution(grammar.InputSymbol, "Sumit Gulwani")) as string);
+        }
 
         public ProgramNode GetFirstProgram(Dictionary<string, string> examples) {
             return GetPrograms(examples).First();
