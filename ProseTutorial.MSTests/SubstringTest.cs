@@ -64,7 +64,22 @@ namespace ProseTutorial
             var program = programs.First();
 
             Assert.AreEqual("16", program.Invoke(State.CreateForExecution(grammar.InputSymbol, "16-Feb-2016")) as string);
-            Assert.AreEqual(2, programs.Count());
+            Assert.AreEqual(8, programs.Count()); //Adicionando o suporte a posições negativas aumenta o número de programas de 2 para 8.
+        }
+
+        [TestMethod]
+        public void TestLearnSubstringNegativeAbsPos()
+        {
+            var examples = new Dictionary<string, string> 
+            { 
+                {"(Gustavo Soares)", "Gustavo Soares"}, 
+                {"(Titus Barik)", "Titus Barik"},
+            };
+
+            var program = GetFirstProgram(examples).First();;
+
+            Assert.AreEqual("Gustavo Soares", program.Invoke(State.CreateForExecution(grammar.InputSymbol, "(Gustavo Soares)")) as string);
+            Assert.AreEqual("Titus Barik", program.Invoke(State.CreateForExecution(grammar.InputSymbol, "(Titus Barik)")) as string);
         }
 
 

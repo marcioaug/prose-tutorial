@@ -30,12 +30,10 @@ namespace ProseTutorial
                 var input = inputState[rule.Body[0]] as string;
                 var output = example.Value as string;
                 var occurrences = new List<int>();
-                int index = input.IndexOf(output);
 
-                while (index != -1) 
+                for (int i = input.IndexOf(output); i >= 0; i = input.IndexOf(output, i + 1))
                 {
-                    occurrences.Add(index);
-                    index = input.IndexOf(output, index + (output.Length));
+                    occurrences.Add(i);
                 }
                 
                 if (occurrences.IsEmpty()) return null;
@@ -76,6 +74,7 @@ namespace ProseTutorial
                 foreach (int pos in example.Value)
                 {
                     positions.Add(pos + 1);
+                    positions.Add(pos - v.Length - 1);
                 }
 
                 if (positions.IsEmpty()) return null;

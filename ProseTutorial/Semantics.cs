@@ -6,7 +6,7 @@ namespace ProseTutorial
 
         public static int? AbsPos(string v, int k) 
         {
-            return k - 1;
+            return k > 0 ? k - 1 : v.Length + k + 1;
         }
     }
 }
