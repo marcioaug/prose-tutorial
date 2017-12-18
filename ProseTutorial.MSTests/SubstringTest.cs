@@ -30,12 +30,12 @@ namespace ProseTutorial
                 {"19-Feb-1960", "Feb"} 
             };
 
-            var program = GetFirstProgram(examples);
+            var program = GetFirstProgram(examples).First();;
 
             Assert.AreEqual("Feb", program.Invoke(State.CreateForExecution(grammar.InputSymbol, "19-Feb-1960")) as string);
         }
 
-                [TestMethod]
+        [TestMethod]
         public void TestLearnSubstringPositiveAbsPosSecOcorrence()
         {
 
@@ -45,15 +45,30 @@ namespace ProseTutorial
                 {"14-Jan-2012", "12"},
             };
 
-            var program = GetFirstProgram(examples);
+            var program = GetFirstProgram(examples).First();;
 
             Assert.AreEqual("16", program.Invoke(State.CreateForExecution(grammar.InputSymbol, "16-Feb-2016")) as string);
             Assert.AreEqual("12", program.Invoke(State.CreateForExecution(grammar.InputSymbol, "14-Jan-2012")) as string);
         }
 
+        [TestMethod]
+        public void TestLearnSubstringPositiveAbsPosSecOcorrenceOneExp() 
+        {
+
+            var examples = new Dictionary<string, string>
+            {
+                {"16-Feb-2016", "16"}
+            };
+
+            var programs = GetFirstProgram(examples);
+            var program = programs.First();
+
+            Assert.AreEqual("16", program.Invoke(State.CreateForExecution(grammar.InputSymbol, "16-Feb-2016")) as string);
+            Assert.AreEqual(2, programs.Count());
+        }
 
 
-        public ProgramNode GetFirstProgram(Dictionary<string, string> examples) {
+        public IEnumerable<ProgramNode> GetFirstProgram(Dictionary<string, string> examples) {
 
             var prose = ConfigureSynthesis(grammar);
 
@@ -70,7 +85,7 @@ namespace ProseTutorial
             var learnedSet = prose.LearnGrammar(spec);
 
             var programs = learnedSet.RealizedPrograms;
-            return programs.First();
+            return programs;
         }
 
 

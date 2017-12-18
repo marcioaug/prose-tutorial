@@ -1,6 +1,7 @@
 using System;
 
 using System.Collections.Generic;
+using System.Linq;
 
 using Microsoft.ProgramSynthesis;
 using Microsoft.ProgramSynthesis.Learning;
@@ -19,57 +20,70 @@ namespace ProseTutorial
         }
         
         [WitnessFunction(nameof(Semantics.Substring), 1)]
-        public ExampleSpec WitnessStartPosition(GrammarRule rule, ExampleSpec spec)
+        public DisjunctiveExamplesSpec WitnessStartPosition(GrammarRule rule, ExampleSpec spec)
         {
-            var result = new Dictionary<State, object>();
+            var result = new Dictionary<State, IEnumerable<object>>();
 
             foreach (var example in spec.Examples) 
             {
                 State inputState = example.Key;
                 var input = inputState[rule.Body[0]] as string;
                 var output = example.Value as string;
-                var refinedExample = input.IndexOf(output);
+                var occurrences = new List<int>();
+                int index = input.IndexOf(output);
 
-                result[inputState] = refinedExample;
+                while (index != -1) 
+                {
+                    occurrences.Add(index);
+                    index = input.IndexOf(output, index + (output.Length));
+                }
+                
+                if (occurrences.IsEmpty()) return null;
+                result[inputState] = occurrences.Cast<object>();
             }
 
-            return new ExampleSpec(result);
+            return new DisjunctiveExamplesSpec(result);
         }
 
-        [WitnessFunction(nameof(Semantics.Substring), 2)]
-        public ExampleSpec WitnessEndPosition(GrammarRule rule, ExampleSpec spec)
+        [WitnessFunction(nameof(Semantics.Substring), 2, DependsOnParameters = new []{1})]
+        public ExampleSpec WitnessEndPosition(GrammarRule rule, ExampleSpec spec, ExampleSpec startSpec)
         {
             var result = new Dictionary<State, object>();
 
             foreach (var example in spec.Examples) 
             {
                 State inputState = example.Key;
-                var input = inputState[rule.Body[0]] as string;
                 var output = example.Value as string;
-
-                var refinedExample = input.IndexOf(output) + output.Length;
-
-                result[inputState] = refinedExample;
+                var start = (int) startSpec.Examples[inputState];
+                result[inputState] = start + output.Length;
             }
 
             return new ExampleSpec(result);
         }
 
         [WitnessFunction(nameof(Semantics.AbsPos), 1)]
-        public ExampleSpec WitnessK(GrammarRule rule, ExampleSpec spec)
+        public DisjunctiveExamplesSpec WitnessK(GrammarRule rule, DisjunctiveExamplesSpec spec)
         {
-            var result = new Dictionary<State, object>();
+            var result = new Dictionary<State, IEnumerable<object>>();
 
-            foreach (var example in spec.Examples) 
+            foreach (var example in spec.DisjunctiveExamples) 
             {
                 State inputState = example.Key;
                 var v = inputState[rule.Body[0]] as string;
-                var pos = (int) example.Value;
+                
+                var positions = new List<int>();
 
-                result[inputState] = pos + 1;
+                foreach (int pos in example.Value)
+                {
+                    positions.Add(pos + 1);
+                }
+
+                if (positions.IsEmpty()) return null;
+
+                result[inputState] = positions.Cast<object>();
             }
 
-            return new ExampleSpec(result);
+            return new DisjunctiveExamplesSpec(result);
         }
 
     }
